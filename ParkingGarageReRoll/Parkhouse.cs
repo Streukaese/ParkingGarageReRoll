@@ -380,10 +380,10 @@ namespace ParkingGarageReRoll
                     MessageBox.Show("Error deleting the vehicle: " + ex.Message);
                 }
                 finally
-                {
+                {  
                     SqlDatabase.Close();
                 }
-                // ToDo - Be able to delete unparked cars - must be useful -> not asked by town Vence
+                // ToDo -- Be able to delete unparked cars - must be useful -> not asked by town Vence
         
             }
             dataGridViewVehicle.Rows.RemoveAt(index);
