@@ -23,7 +23,7 @@ namespace ParkingGarageReRoll
             CarSlotCount = carNumber;
             BikeSlotCount = bikeNumber;
         }
-        // Static funktioniert nicht
+        // returns the highest floor number ==> to DELETE only the last floor
         public static int GetNextAvailableFloorname()
         {
             int nextFloorname = 0;
@@ -37,15 +37,10 @@ namespace ParkingGarageReRoll
                 nextFloorname = Convert.ToInt32(result)+1;
             }
             SqlDatabase.Close();
-
-            //if(result != DBNull.Value)
-            //{
-            //    nextAviableFloorname = Convert.ToInt32(result);
-            //}
-
             return nextFloorname;
         }
 
+        // shows parked vehicles AT "DataGridViewVehicle"
         public List<Vehicle> GetParkedVehicles()
         {
             List<Vehicle> parked = new List<Vehicle>();
@@ -57,20 +52,20 @@ namespace ParkingGarageReRoll
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    parked.Add(new Vehicle(reader.GetInt32("VehicleId"), reader.GetString("LicensePlate"), reader.GetString("VehicleType"), reader.GetInt32("CarSlotId"),this.FloorId,this.FloorName));
+                    parked.Add(new Vehicle(reader.GetInt32("VehicleId"), reader.GetString("LicensePlate"), reader.GetString("VehicleType"), reader.GetInt32("CarSlotId"),this.FloorName, reader.GetInt32("ParkingPosition")));
                 }
                 reader.Close();
                 command.CommandText = "SELECT b.BikeSlotId, b.FloorId, b.VehicleId, b.ParkingPosition, v.LicensePlate, v.VehicleType FROM `bikeslot` b JOIN Vehicle v ON v.VehicleId = b.VehicleID WHERE b.FloorId = '" + this.FloorId + "' AND b.VehicleId IS NOT NULL";
                 reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    parked.Add(new Vehicle(reader.GetInt32("VehicleId"), reader.GetString("LicensePlate"), reader.GetString("VehicleType"), reader.GetInt32("BikeSlotId"), this.FloorId, this.FloorName));
+                    parked.Add(new Vehicle(reader.GetInt32("VehicleId"), reader.GetString("LicensePlate"), reader.GetString("VehicleType"), reader.GetInt32("BikeSlotId"), this.FloorName,reader.GetInt32("ParkingPosition")));
                 }
                 reader.Close();
             }
             catch (SqlException ex)
             {
-                Console.WriteLine("Error counting parked bikes: " + ex.Message);
+                Console.WriteLine("Error counting parked vehicles: " + ex.Message);
             }
             finally
             {

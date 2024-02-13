@@ -99,14 +99,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Floor.cs" />
-    <Compile Include="LoadTablesSql.cs" />
+    <Compile Include="SqlLoadTables.cs" />
     <Compile Include="Parkhouse.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Parkhouse.Designer.cs">
       <DependentUpon>Parkhouse.cs</DependentUpon>
     </Compile>
-    <Compile Include="ParkingSpot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlDatabase.cs" />

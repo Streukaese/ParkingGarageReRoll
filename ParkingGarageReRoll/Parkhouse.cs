@@ -19,7 +19,6 @@ namespace ParkingGarageReRoll
         Floor floor = null;
         Vehicle vehicle = null;
 
-        //GetParkedVehicleByIndex gpvByIndex = new GetParkedVehicleByIndex();
         public Parkhouse()
         {
             InitializeComponent();
@@ -49,7 +48,7 @@ namespace ParkingGarageReRoll
         }
         internal void LoadParkingFloors()
         {
-            List<Floor> floors = LoadTablesSql.LoadParkingFloors();
+            List<Floor> floors = SqlLoadTables.LoadParkingFloors();
             foreach (Floor floor in floors)
             {
                 AddFloor(floor);
@@ -79,7 +78,7 @@ namespace ParkingGarageReRoll
                 return;
             }
 
-            // TODO - Floor muss immer bei 0 anfangen - Wenn floor gelöscht muss nächster die gelöschte zahl erhalten -- Done = Nur letzter Floor löschbar
+            // Only last floor deletable
             int floorname = Floor.GetNextAvailableFloorname();
 
             try
@@ -133,6 +132,7 @@ namespace ParkingGarageReRoll
         {
             int index = -1;
 
+            // ToDo - Update syntax 
             if (dataGridViewParkingFloor.SelectedRows.Count == 1)
             {
                 index = dataGridViewParkingFloor.SelectedRows[0].Index;
@@ -162,15 +162,8 @@ namespace ParkingGarageReRoll
                 return;
             }
 
-
             SqlDatabase.Open();
 
-            //TODO fehlende slots erstellen (falls count größer geworden) oder überschüssige slots löschen (fals count kleiner geworden)
-            //if(newcarnumber<bearbeitetesFloor.carNumber)
-            //delete from carslot where floorid=... and parkingposition>newcarnumber
-            //else if(newcarnumber>bearbeiteterFloor.carNumber)
-            //for(int i=bearbeiteterFloor.carNumber;i<newcarnumber;++i)
-            //inser into carslot(...)
             MySqlCommand command;
             if (newCarSlot < floor.CarSlotCount)
             {
@@ -246,7 +239,7 @@ namespace ParkingGarageReRoll
 
                 cmd.CommandText = "SELECT FloorId FROM floor where floorname=(SELECT MAX(Floorname) FROM floor)";
                 int lastFloorid = (int)cmd.ExecuteScalar();
-
+                // Need to delete vehicleSlots to - REFERENCES
                 cmd = SqlDatabase.CreateCommand();
                 cmd.CommandText = "delete from carslot where FloorId=@FloorId";
                 cmd.Parameters.AddWithValue("FloorId", lastFloorid);
@@ -256,8 +249,7 @@ namespace ParkingGarageReRoll
                 cmd.Parameters.AddWithValue("FloorId", lastFloorid);
                 cmd.ExecuteNonQuery();
 
-
-                cmd.CommandText = "DELETE FROM floor WHERE FloorId = @id"; //TODO ID herausfinden
+                cmd.CommandText = "DELETE FROM floor WHERE FloorId = @id";
                 cmd.Parameters.AddWithValue("id", lastFloorid);
                 int rowsAffected = cmd.ExecuteNonQuery();
 
@@ -303,21 +295,6 @@ namespace ParkingGarageReRoll
                 return;
             }
 
-            // ----->> The vehicle is parked on the floor using an extra button <<-----
-
-            //int markiertIndex = -1;
-            //if (dataGridViewParkingFloor.SelectedRows.Count == 1)
-            //{
-            //    markiertIndex = dataGridViewParkingFloor.CurrentRow.Index;
-            //}
-
-            //if (markiertIndex == -1)
-            //{
-            //    return;
-            //}
-            //int floorId = (int)dataGridViewParkingFloor.Rows[markiertIndex].Cells["ColumnId"].Value;
-            //int floorname = (int)dataGridViewParkingFloor.Rows[markiertIndex].Cells["ColumnFloorname"].Value;
-
             try
             {
                 SqlDatabase.Open();       // Table Vehicle
@@ -333,23 +310,15 @@ namespace ParkingGarageReRoll
                                                             // Add LicensePlate in Upper Case
                 AddVehicleToFloor(new Vehicle(id, licensePlate.ToUpper(), vehicleType, 0, 0, 0));
             }
-            //else
-            //{
-            //    MessageBox.Show("No free parking slots at this floor");
-            //}
             catch (Exception ex)
             {
                 Console.WriteLine("Error adding a vehicle: " + ex.Message);
-                // Database column "LicensePlate" = unique || Shows the Exception
+                                                          // Database column "LicensePlate" IS unique => Shows the Exception
                 MessageBox.Show("Error adding a vehicle: " + ex.Message);
             }
         }
 
-        // Useful to implement => not wanted by village Vence
-        private void buttonVehicleUpdate_Click(object sender, EventArgs e)
-        {
-            buttonVehicleUpdate.Visible = false;
-        }
+        // BUTTON-VEHICLE-UPDATE useful to implement => not asked by town Vence
 
         private void buttonVehicleRemove_Click(object sender, EventArgs e)
         {
@@ -390,8 +359,6 @@ namespace ParkingGarageReRoll
 
                     MySqlCommand cmd = SqlDatabase.CreateCommand();
 
-
-                    // ToDo - if + ifelse schleife = Alternative löschung aus den Slots
                     cmd = SqlDatabase.CreateCommand();
                     cmd.CommandText = "update carslot set vehicleid=null where VehicleId = @VehicleId";
                     cmd.Parameters.AddWithValue("VehicleId", vehicleId);
@@ -401,21 +368,11 @@ namespace ParkingGarageReRoll
                     cmd.Parameters.AddWithValue("VehicleId", vehicleId);
                     cmd.ExecuteNonQuery();
 
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    // ToDo - Fix it == rowsAffected every time 0 ALSO hits the ELSE statement (Still when vehicle parked out)
-                    if (rowsAffected > 0)
-                    {
-                        MessageBox.Show("Vehicle is parked out.");
-                        vehicle.SlotId = 0;
-                        vehicle.ParkingPosition = 0;
-                        vehicle.Floorname = 0;
-                    }
-                    else
-                    {
-                        MessageBox.Show("No vehicle found to park out.");
-                    }
+                    MessageBox.Show("Vehicle is parked out.");
+                    vehicle.SlotId = 0;
+                    vehicle.ParkingPosition = 0;
+                    vehicle.Floorname = 0;
+              
                 }
                 catch (SqlException ex)
                 {
@@ -426,14 +383,11 @@ namespace ParkingGarageReRoll
                 {
                     SqlDatabase.Close();
                 }
-                // ToDo - Ungeparkte Autos löschen können
-                dataGridViewVehicle.Rows.RemoveAt(index);
+                // ToDo - Be able to delete unparked cars - must be useful -> not asked by town Vence
+        
             }
-            //LoadParkingFloors();
-
-            // -------------------------------------------------------------------------------------- 
+            dataGridViewVehicle.Rows.RemoveAt(index);
         }
-        // ------------"buttonSearch_Click" Anpassen an neue Logik----------------------
         private void buttonSearch_Click(object sender, EventArgs e)
         {
             string search = textBoxSearch.Text.ToUpper();
@@ -481,96 +435,12 @@ namespace ParkingGarageReRoll
                 SqlDatabase.Close();
             }
             textBoxSearch.Text = "<<License plate>>";
-            //----------------------------------------------------------------------
         }
         private void textBoxSearch_Click(object sender, EventArgs e)
         {
             textBoxSearch.Text = "";
             labelSearchResult.Text = "<<Result of your search>>";
         }
-
-        // -------------Vorrübergehende Funktionen Auslagern -> Geht nicht weil verweis auf "floorById" fehlt..?!?---------------
-        internal int GetSelectedDgvFloorIndex()
-        {
-            // Im "Parkhouse.Designer.cs" die GUI-Elemente von "privat" auf "internal" gesetzt
-            dataGridViewVehicle.Rows.Clear();
-
-            int markiertIndex = -1;
-            if (dataGridViewParkingFloor.SelectedRows.Count == 1)
-            {
-                markiertIndex = dataGridViewParkingFloor.CurrentRow.Index;
-            }
-
-            if (markiertIndex == -1)
-            {
-                //return;
-            }
-            DataGridViewCell cell = dataGridViewParkingFloor.Rows[markiertIndex].Cells["ColumnId"];
-            if (cell.Value == null)
-            {
-                //return;
-            }
-            int id = (int)cell.Value;
-
-            return id;
-        }
-        internal int GetParkedBikeByIndex(int id)
-        {
-            // Gibt den Index der Ausgewählten Zeile wieder
-            floor = floorById[id];
-
-            int parkedCars = 0;
-
-            try
-            {
-                SqlDatabase.Open();
-                MySqlCommand command = SqlDatabase.CreateCommand();
-                command.CommandText = "SELECT COUNT(*) FROM vehicle WHERE FloorId =" + floor.FloorId + " AND VehicleType = 'Motorbike'"; //"SELECT Floorname FROM ParkingFloor WHERE Floorname > 0 ORDER BY Floorname ASC LIMIT 1"
-                object result = command.ExecuteScalar();
-                if (result != null && result != DBNull.Value)
-                {
-                    parkedCars = Convert.ToInt32(result);
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("Error counting parked motorcycles: " + ex.Message);
-            }
-            finally
-            {
-                SqlDatabase.Close();
-            }
-            return parkedCars;
-        }
-        internal int GetParkedCarByIndex(int id)
-        {
-            // Gibt den Index der Ausgewählten Zeile wieder
-            floor = floorById[id];
-
-            int parkedCars = 0;
-
-            try
-            {
-                SqlDatabase.Open();
-                MySqlCommand command = SqlDatabase.CreateCommand();
-                command.CommandText = "SELECT COUNT(*) FROM vehicle WHERE FloorId =" + floor.FloorId + " AND VehicleType = 'Car'"; //"SELECT Floorname FROM ParkingFloor WHERE Floorname > 0 ORDER BY Floorname ASC LIMIT 1"
-                object result = command.ExecuteScalar();
-                if (result != null && result != DBNull.Value)
-                {
-                    parkedCars = Convert.ToInt32(result);
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("Error counting parked cars: " + ex.Message);
-            }
-            finally
-            {
-                SqlDatabase.Close();
-            }
-            return parkedCars;
-        }
-        // -------------Vorrübergehende Funktionen Auslagern -> Geht nicht weil verweis auf "floorById" fehlt..?!?--------------- ENDE 
         private void dataGridViewParkingFloor_SelectionChanged(object sender, EventArgs e)
         {
             dataGridViewVehicle.Rows.Clear();
@@ -609,8 +479,12 @@ namespace ParkingGarageReRoll
                 }
                 labelFreeParkSlot.Text = "Unparked Cars: " + cars
                     + "\rUnparked Bikes:" + bikes;
+                
+                labelParkingVehicle.Text = "Unparked vehicles bellow:";
                                     // Button rename
-                buttonVehicleRemove.Text = "Park in";
+                buttonVehicleParkinParkout.Text = "Park in";
+                // Doesnt work -- fix it (dgv remove the parked in vehicle)
+                dataGridViewVehicle.Refresh();
             }
             else
             {
@@ -625,16 +499,22 @@ namespace ParkingGarageReRoll
                     dataGridViewVehicle.Rows[i].Cells["ColumnVehicleId"].Value = v.VehicleId;
                     dataGridViewVehicle.Rows[i].Cells["ColumnVehicleLicensePlate"].Value = v.LicensePlate;
                     dataGridViewVehicle.Rows[i].Cells["ColumnVehicleType"].Value = v.VehicleType;
-                    dataGridViewVehicle.Rows[i].Cells["ColumnVehicleParkingPosition"].Value = v.ParkingPosition;
+                    dataGridViewVehicle.Rows[i].Cells["ColumnVehicleParkingPosition"].Value = v.ParkingPosition;        // Doesnt shows well -- fix it (while not fixed == visible)
                 }
                 labelFreeParkSlot.Text = "Parked Cars: " + cars
                     + "\rFree Car Slots:" + (floor.CarSlotCount - cars)
                     + "\rParked Bikes:" + bikes
                     + "\rFree Bike Slots:" + (floor.BikeSlotCount - bikes);
-                                    // Button rename
-                buttonVehicleRemove.Text = "Park out";
+                labelParkingVehicle.Text = "Parked vehicles bellow:";
+                                        // Button rename
+                buttonVehicleParkinParkout.Text = "Park out";
             }
            
+        }
+
+        private void dataGridViewParkingFloor_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

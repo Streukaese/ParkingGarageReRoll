@@ -26,6 +26,7 @@ namespace ParkingGarageReRoll
             Floorname = floorname;
             ParkingPosition = parkingPosition;
         }
+        
 
         public static List<Vehicle> GetUnparkedVehicles()
         {
@@ -37,7 +38,7 @@ namespace ParkingGarageReRoll
                 command.CommandText = "SELECT VehicleId, LicensePlate, VehicleType FROM `vehicle` v WHERE NOT EXISTS (SELECT * FROM bikeslot b WHERE b.VehicleId = v.VehicleId) AND NOT EXISTS(select * from carslot c where c.VehicleId=v.VehicleId)";
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
-                {
+                {                                                                                                                        // Doesnt needed at this point
                     unparked.Add(new Vehicle(reader.GetInt32("VehicleId"), reader.GetString("LicensePlate"), reader.GetString("VehicleType"),0,0,0));
                 }
                 reader.Close();
@@ -52,7 +53,7 @@ namespace ParkingGarageReRoll
             }
             return unparked;
         }
-
+        // To ADD the vehicle in the aviable parkslot
         public static int GetNextAviableParkSlot(string vehicleType)
         {
             int freeParkSlotId = 0;
@@ -60,11 +61,11 @@ namespace ParkingGarageReRoll
             {
                 SqlDatabase.Open();
                 MySqlCommand command = SqlDatabase.CreateCommand();
-                command.CommandText = vehicleType == "Car" ? "SELECT BikeSlotId FROM `carslot` v WHERE VehicleId IS NULL" : "SELECT BikeSlotId FROM `bikeslot` v WHERE VehicleId IS NULL";
+                command.CommandText = vehicleType == "Car" ? "SELECT CarSlotId as SlotId FROM `carslot` v WHERE VehicleId IS NULL" : "SELECT BikeSlotId as SlotId FROM `bikeslot` v WHERE VehicleId IS NULL";
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    freeParkSlotId = reader.GetInt32("BikeSlotID");
+                    freeParkSlotId = reader.GetInt32("SlotId");
                     break;
                 }
                 reader.Close();
@@ -93,8 +94,8 @@ namespace ParkingGarageReRoll
 
                 //We still must get the slot infos
                 command = SqlDatabase.CreateCommand();
-                command.CommandText = VehicleType == "Motorcycle" ? "SELECT s.ParkingPosition, f.Floorname from `carslot` s JOINT floor f on f.FloorId=s.FloorId WHERE CarSLotId = @Id" :
-                   "SELECT s.ParkingPosition, f.Floorname from `bikeslot` s JOINT floor f on f.FloorId = s.FloorId WHERE BikeSLotId = @Id";
+                command.CommandText = VehicleType == "Car" ? "SELECT s.ParkingPosition, f.Floorname from `carslot` s JOIN floor f on f.FloorId=s.FloorId WHERE CarSLotId = @Id" :
+                   "SELECT s.ParkingPosition, f.Floorname from `bikeslot` s JOIN floor f on f.FloorId = s.FloorId WHERE BikeSLotId = @Id";
                 command.Parameters.AddWithValue("Id", slotId);
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())

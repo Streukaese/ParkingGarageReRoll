@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace ParkingGarageReRoll
 {
-    public class LoadTablesSql
+    public class SqlLoadTables
     {
         static public List<Floor> LoadParkingFloors()
         {
@@ -41,10 +41,6 @@ namespace ParkingGarageReRoll
                 SqlDatabase.Close();
             }
             return floors;
-        }
-        private LoadTablesSql()
-        {
-
         }
     }
 }

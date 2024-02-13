@@ -43,8 +43,7 @@
             this.labelParkingVehicle = new System.Windows.Forms.Label();
             this.labelParkingFloor = new System.Windows.Forms.Label();
             this.labelFreeParkSlot = new System.Windows.Forms.Label();
-            this.buttonVehicleUpdate = new System.Windows.Forms.Button();
-            this.buttonVehicleRemove = new System.Windows.Forms.Button();
+            this.buttonVehicleParkinParkout = new System.Windows.Forms.Button();
             this.buttonVehicleAdd = new System.Windows.Forms.Button();
             this.buttonFloorUpdate = new System.Windows.Forms.Button();
             this.buttonFloorRemove = new System.Windows.Forms.Button();
@@ -59,6 +58,7 @@
             this.ColumnFloorname = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnCarSlotCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnBikeSlotCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.labelExplain = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownFloorBike)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownFloorCar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVehicle)).BeginInit();
@@ -76,7 +76,7 @@
             // 
             // buttonSearch
             // 
-            this.buttonSearch.Location = new System.Drawing.Point(922, 494);
+            this.buttonSearch.Location = new System.Drawing.Point(910, 494);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(221, 35);
             this.buttonSearch.TabIndex = 48;
@@ -97,7 +97,7 @@
             // 
             this.textBoxSearch.Location = new System.Drawing.Point(1011, 466);
             this.textBoxSearch.Name = "textBoxSearch";
-            this.textBoxSearch.Size = new System.Drawing.Size(132, 22);
+            this.textBoxSearch.Size = new System.Drawing.Size(120, 22);
             this.textBoxSearch.TabIndex = 46;
             this.textBoxSearch.Text = "<<License Plate>>";
             this.textBoxSearch.Click += new System.EventHandler(this.textBoxSearch_Click);
@@ -174,11 +174,11 @@
             // labelParkingVehicle
             // 
             this.labelParkingVehicle.AutoSize = true;
-            this.labelParkingVehicle.Location = new System.Drawing.Point(318, 282);
+            this.labelParkingVehicle.Location = new System.Drawing.Point(318, 278);
             this.labelParkingVehicle.Name = "labelParkingVehicle";
-            this.labelParkingVehicle.Size = new System.Drawing.Size(329, 16);
+            this.labelParkingVehicle.Size = new System.Drawing.Size(62, 16);
             this.labelParkingVehicle.TabIndex = 35;
-            this.labelParkingVehicle.Text = "\"Parkende Fahrzeuge der markierten Etage anzeigen\"";
+            this.labelParkingVehicle.Text = "Vehicles:";
             // 
             // labelParkingFloor
             // 
@@ -199,25 +199,15 @@
             this.labelFreeParkSlot.TabIndex = 33;
             this.labelFreeParkSlot.Text = "\"Aviable parking space of floor\"";
             // 
-            // buttonVehicleUpdate
+            // buttonVehicleParkinParkout
             // 
-            this.buttonVehicleUpdate.Location = new System.Drawing.Point(94, 429);
-            this.buttonVehicleUpdate.Name = "buttonVehicleUpdate";
-            this.buttonVehicleUpdate.Size = new System.Drawing.Size(221, 35);
-            this.buttonVehicleUpdate.TabIndex = 32;
-            this.buttonVehicleUpdate.Text = "Update Vehicle";
-            this.buttonVehicleUpdate.UseVisualStyleBackColor = true;
-            this.buttonVehicleUpdate.Click += new System.EventHandler(this.buttonVehicleUpdate_Click);
-            // 
-            // buttonVehicleRemove
-            // 
-            this.buttonVehicleRemove.Location = new System.Drawing.Point(959, 301);
-            this.buttonVehicleRemove.Name = "buttonVehicleRemove";
-            this.buttonVehicleRemove.Size = new System.Drawing.Size(221, 35);
-            this.buttonVehicleRemove.TabIndex = 31;
-            this.buttonVehicleRemove.Text = "Remove Vehicle";
-            this.buttonVehicleRemove.UseVisualStyleBackColor = true;
-            this.buttonVehicleRemove.Click += new System.EventHandler(this.buttonVehicleRemove_Click);
+            this.buttonVehicleParkinParkout.Location = new System.Drawing.Point(959, 301);
+            this.buttonVehicleParkinParkout.Name = "buttonVehicleParkinParkout";
+            this.buttonVehicleParkinParkout.Size = new System.Drawing.Size(221, 35);
+            this.buttonVehicleParkinParkout.TabIndex = 31;
+            this.buttonVehicleParkinParkout.Text = "Parkin/Parkout";
+            this.buttonVehicleParkinParkout.UseVisualStyleBackColor = true;
+            this.buttonVehicleParkinParkout.Click += new System.EventHandler(this.buttonVehicleRemove_Click);
             // 
             // buttonVehicleAdd
             // 
@@ -245,7 +235,7 @@
             this.buttonFloorRemove.Name = "buttonFloorRemove";
             this.buttonFloorRemove.Size = new System.Drawing.Size(221, 35);
             this.buttonFloorRemove.TabIndex = 28;
-            this.buttonFloorRemove.Text = "Remove Parking Floor";
+            this.buttonFloorRemove.Text = "Remove Last Floor";
             this.buttonFloorRemove.UseVisualStyleBackColor = true;
             this.buttonFloorRemove.Click += new System.EventHandler(this.buttonFloorRemove_Click);
             // 
@@ -302,7 +292,6 @@
             this.ColumnVehicleParkingPosition.MinimumWidth = 6;
             this.ColumnVehicleParkingPosition.Name = "ColumnVehicleParkingPosition";
             this.ColumnVehicleParkingPosition.ReadOnly = true;
-            this.ColumnVehicleParkingPosition.Visible = false;
             this.ColumnVehicleParkingPosition.Width = 125;
             // 
             // ColumnVehicleLicensePlate
@@ -332,6 +321,7 @@
             this.dataGridViewParkingFloor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewParkingFloor.Size = new System.Drawing.Size(552, 224);
             this.dataGridViewParkingFloor.TabIndex = 25;
+            this.dataGridViewParkingFloor.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewParkingFloor_CellClick);
             this.dataGridViewParkingFloor.SelectionChanged += new System.EventHandler(this.dataGridViewParkingFloor_SelectionChanged);
             // 
             // ColumnID
@@ -367,11 +357,21 @@
             this.ColumnBikeSlotCount.ReadOnly = true;
             this.ColumnBikeSlotCount.Width = 125;
             // 
+            // labelExplain
+            // 
+            this.labelExplain.AutoSize = true;
+            this.labelExplain.Location = new System.Drawing.Point(703, 12);
+            this.labelExplain.Name = "labelExplain";
+            this.labelExplain.Size = new System.Drawing.Size(170, 16);
+            this.labelExplain.TabIndex = 50;
+            this.labelExplain.Text = "strg + click = ClearSelection";
+            // 
             // Parkhouse
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1207, 556);
+            this.ClientSize = new System.Drawing.Size(1224, 556);
+            this.Controls.Add(this.labelExplain);
             this.Controls.Add(this.labelSearchResult);
             this.Controls.Add(this.buttonSearch);
             this.Controls.Add(this.labelSearch);
@@ -387,8 +387,7 @@
             this.Controls.Add(this.labelParkingVehicle);
             this.Controls.Add(this.labelParkingFloor);
             this.Controls.Add(this.labelFreeParkSlot);
-            this.Controls.Add(this.buttonVehicleUpdate);
-            this.Controls.Add(this.buttonVehicleRemove);
+            this.Controls.Add(this.buttonVehicleParkinParkout);
             this.Controls.Add(this.buttonVehicleAdd);
             this.Controls.Add(this.buttonFloorUpdate);
             this.Controls.Add(this.buttonFloorRemove);
@@ -424,8 +423,7 @@
         private System.Windows.Forms.Label labelParkingVehicle;
         private System.Windows.Forms.Label labelParkingFloor;
         private System.Windows.Forms.Label labelFreeParkSlot;
-        private System.Windows.Forms.Button buttonVehicleUpdate;
-        private System.Windows.Forms.Button buttonVehicleRemove;
+        private System.Windows.Forms.Button buttonVehicleParkinParkout;
         private System.Windows.Forms.Button buttonVehicleAdd;
         private System.Windows.Forms.Button buttonFloorUpdate;
         private System.Windows.Forms.Button buttonFloorRemove;
@@ -440,6 +438,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnVehicleType;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnVehicleParkingPosition;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnVehicleLicensePlate;
+        private System.Windows.Forms.Label labelExplain;
     }
 }
 
